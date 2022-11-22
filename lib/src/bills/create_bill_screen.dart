@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -59,16 +61,25 @@ class _CreateBillScreen extends State<CreateBillScreen> {
             onPressed: () async {
               // Confirm with user that data is finalized
 
+              // Generate unique 4-letter code
+              const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+              var code = '';
+              for (var i = 0; i < 4; i++) {
+                final index = Random().nextInt(alphabet.length);
+                code += alphabet[index];
+              }
+              // TODO: Check that code is unique in database
+              print(code);
+
               // Upload data as read-only to new doc in Firebase
               await FirebaseFirestore.instance
                   .collection('bills')
                   .add(<String, dynamic>{
                 'title': _title.text,
                 'description': _description.text,
+                'code': code,
                 'timestamp': DateTime.now().toIso8601String(),
               });
-
-              // Generate unique link for doc
             },
             icon: const Icon(Icons.share),
             label: const Text('Share this bill'),
