@@ -1,10 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class CreateBillScreen extends StatelessWidget {
+class CreateBillScreen extends StatefulWidget {
   const CreateBillScreen({super.key});
 
   static const routeName = '/bills';
+
+  @override
+  State<CreateBillScreen> createState() => _CreateBillScreen();
+}
+
+class _CreateBillScreen extends State<CreateBillScreen> {
+  final _title = TextEditingController();
+  final _description = TextEditingController();
+
+  @override
+  void dispose() {
+    _title.dispose();
+    _description.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +32,8 @@ class CreateBillScreen extends StatelessWidget {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
+            child: TextField(
+              controller: _title,
               decoration: const InputDecoration(
                 hintText: 'What should we call this bill?',
                 labelText: 'Title',
@@ -27,6 +43,7 @@ class CreateBillScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
+              controller: _description,
               decoration: const InputDecoration(
                 hintText: 'Any details we should mention?',
                 labelText: 'Description (optional)',
@@ -46,6 +63,8 @@ class CreateBillScreen extends StatelessWidget {
               await FirebaseFirestore.instance
                   .collection('bills')
                   .add(<String, dynamic>{
+                'title': _title.text,
+                'description': _description.text,
                 'timestamp': DateTime.now().toIso8601String(),
               });
 
