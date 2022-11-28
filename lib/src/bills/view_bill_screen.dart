@@ -15,12 +15,12 @@ class ViewBillScreen extends StatefulWidget {
 }
 
 class _ViewBillScreenState extends State<ViewBillScreen> {
-  late Future<Bill> futureBill;
+  late Future<Bill> _bill;
 
   @override
   void initState() {
     super.initState();
-    futureBill = BillService.fetch(widget.code);
+    _bill = BillService.fetch(widget.code);
   }
 
   @override
@@ -31,7 +31,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
       ),
       body: Center(
         child: FutureBuilder<Bill>(
-          future: futureBill,
+          future: _bill,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(
