@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'bill.dart';
+import 'bill_service.dart';
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
@@ -19,7 +20,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   @override
   void initState() {
     super.initState();
-    futureBill = Bill.fetch(widget.code);
+    futureBill = BillService.fetch(widget.code);
   }
 
   @override

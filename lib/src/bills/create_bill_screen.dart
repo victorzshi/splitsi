@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:splitsi/src/bills/view_bill_screen.dart';
 
 import 'bill.dart';
+import 'bill_service.dart';
 
 class CreateBillScreen extends StatefulWidget {
   const CreateBillScreen({super.key});
@@ -61,7 +62,7 @@ class _CreateBillScreen extends State<CreateBillScreen> {
             onPressed: () async {
               // TODO: Confirm with user that data is finalized
 
-              final code = Bill.nextCode();
+              final code = await BillService.nextCode();
               final title = _title.text.isNotEmpty ? _title.text : null;
               final description =
                   _description.text.isNotEmpty ? _description.text : null;
@@ -74,9 +75,9 @@ class _CreateBillScreen extends State<CreateBillScreen> {
                 timestamp: timestamp,
               );
 
-              Bill.upload(bill);
+              BillService.upload(bill);
 
-              Navigator.restorablePushNamed(
+              Navigator.restorablePopAndPushNamed(
                 context,
                 '${ViewBillScreen.routeName}/$code',
               );
