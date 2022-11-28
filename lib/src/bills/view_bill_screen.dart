@@ -14,12 +14,12 @@ class ViewBillScreen extends StatefulWidget {
 }
 
 class _ViewBillScreenState extends State<ViewBillScreen> {
-  late Future<Bill> futureCity;
+  late Future<Bill> futureBill;
 
   @override
   void initState() {
     super.initState();
-    futureCity = Bill.fetch(widget.code);
+    futureBill = Bill.fetch(widget.code);
   }
 
   @override
@@ -30,13 +30,15 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
       ),
       body: Center(
         child: FutureBuilder<Bill>(
-          future: futureCity,
+          future: futureBill,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView(
                 children: [
-                  Text(snapshot.data?.title ?? 'Untitled bill'),
-                  Text(snapshot.data?.description ?? 'No description.'),
+                  Text(snapshot.data?.code ?? 'No code'),
+                  Text(snapshot.data?.title ?? 'No title'),
+                  Text(snapshot.data?.description ?? 'No description'),
+                  Text(snapshot.data?.timestamp ?? 'No timestamp'),
                 ],
               );
             } else if (snapshot.hasError) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:splitsi/src/bills/view_bill_screen.dart';
 
 import 'bill.dart';
 
@@ -60,7 +61,7 @@ class _CreateBillScreen extends State<CreateBillScreen> {
             onPressed: () async {
               // TODO: Confirm with user that data is finalized
 
-              final code = Bill.generateCode();
+              final code = Bill.nextCode();
               final title = _title.text.isNotEmpty ? _title.text : null;
               final description =
                   _description.text.isNotEmpty ? _description.text : null;
@@ -75,7 +76,10 @@ class _CreateBillScreen extends State<CreateBillScreen> {
 
               Bill.upload(bill);
 
-              // TODO: Navigate to view bill screen
+              Navigator.restorablePushNamed(
+                context,
+                '${ViewBillScreen.routeName}/$code',
+              );
             },
             icon: const Icon(Icons.share),
             label: const Text('Share this bill'),

@@ -38,7 +38,7 @@ class Bill {
   }
 
   // Generate unique 4-letter code
-  static String generateCode() {
+  static String nextCode() {
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     var code = '';
@@ -53,10 +53,11 @@ class Bill {
     return code;
   }
 
-  // TODO: Upload bill as read-only
+  // Add read-only bill to database
   static void upload(Bill bill) async {
     final db = FirebaseFirestore.instance;
 
+    // TODO: Set data as read-only
     await db
         .collection("bills")
         .withConverter(
@@ -66,6 +67,7 @@ class Bill {
         .add(bill);
   }
 
+  // Get single bill that has the unique code
   static Future<Bill> fetch(String code) async {
     final db = FirebaseFirestore.instance;
 
