@@ -1,31 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'bill.dart';
-
-Future<Bill> fetchBill(String code) async {
-  final db = FirebaseFirestore.instance;
-
-  final query = db.collection("bills").where("code", isEqualTo: code);
-
-  final ref = query.withConverter(
-    fromFirestore: Bill.fromFirestore,
-    toFirestore: (bill, options) => bill.toFirestore(),
-  );
-
-  final querySnap = await ref.get();
-
-  if (querySnap.docs.isEmpty) {
-    throw Exception('Bill not found');
-  }
-
-  if (querySnap.docs.length != 1) {
-    throw Exception('Bill has non-unique code');
-  }
-
-  final bill = querySnap.docs.first.data();
-  return bill;
-}
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
@@ -44,7 +19,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   @override
   void initState() {
     super.initState();
-    futureCity = fetchBill(widget.code);
+    futureCity = Bill.fetch(widget.code);
   }
 
   @override
@@ -53,18 +28,24 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
       appBar: AppBar(
         title: const Text('View a bill'),
       ),
-      body: FutureBuilder<Bill>(
-        future: futureCity,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Text(snapshot.data!.title ?? 'Untitled bill');
-          } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
-          }
+      body: Center(
+        child: FutureBuilder<Bill>(
+          future: futureCity,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView(
+                children: [
+                  Text(snapshot.data?.title ?? 'Untitled bill'),
+                  Text(snapshot.data?.description ?? 'No description.'),
+                ],
+              );
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            }
 
-          // By default, show a loading spinner.
-          return const CircularProgressIndicator();
-        },
+            return const CircularProgressIndicator();
+          },
+        ),
       ),
     );
   }

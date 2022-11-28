@@ -1,8 +1,6 @@
-import 'dart:math';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:splitsi/src/bills/bill.dart';
+
+import 'bill.dart';
 
 class CreateBillScreen extends StatefulWidget {
   const CreateBillScreen({super.key});
@@ -60,36 +58,24 @@ class _CreateBillScreen extends State<CreateBillScreen> {
           ),
           ElevatedButton.icon(
             onPressed: () async {
-              // Confirm with user that data is finalized
+              // TODO: Confirm with user that data is finalized
 
-              // Generate unique 4-letter code
-              const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-              var code = '';
-              for (var i = 0; i < 4; i++) {
-                final index = Random().nextInt(alphabet.length);
-                code += alphabet[index];
-              }
-              // TODO: Check that code is unique in database
-              print(code);
+              final code = Bill.generateCode();
+              final title = _title.text.isNotEmpty ? _title.text : null;
+              final description =
+                  _description.text.isNotEmpty ? _description.text : null;
+              final timestamp = DateTime.now().toIso8601String();
 
-              // Upload data as read-only to new doc in Firebase
               final bill = Bill(
                 code: code,
-                title: _title.text.isNotEmpty ? _title.text : null,
-                description:
-                    _description.text.isNotEmpty ? _description.text : null,
-                timestamp: DateTime.now().toIso8601String(),
+                title: title,
+                description: description,
+                timestamp: timestamp,
               );
 
-              final db = FirebaseFirestore.instance;
+              Bill.upload(bill);
 
-              await db
-                  .collection("bills")
-                  .withConverter(
-                    fromFirestore: Bill.fromFirestore,
-                    toFirestore: (bill, options) => bill.toFirestore(),
-                  )
-                  .add(bill);
+              // TODO: Navigate to view bill screen
             },
             icon: const Icon(Icons.share),
             label: const Text('Share this bill'),
