@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:splitsi/src/bills/bill.dart';
 
 class CreateBillScreen extends StatefulWidget {
   const CreateBillScreen({super.key});
@@ -72,14 +73,23 @@ class _CreateBillScreen extends State<CreateBillScreen> {
               print(code);
 
               // Upload data as read-only to new doc in Firebase
-              await FirebaseFirestore.instance
-                  .collection('bills')
-                  .add(<String, dynamic>{
-                'title': _title.text,
-                'description': _description.text,
-                'code': code,
-                'timestamp': DateTime.now().toIso8601String(),
-              });
+              final bill = Bill(
+                code: code,
+                title: _title.text.isNotEmpty ? _title.text : null,
+                description:
+                    _description.text.isNotEmpty ? _description.text : null,
+                timestamp: DateTime.now().toIso8601String(),
+              );
+
+              final db = FirebaseFirestore.instance;
+
+              await db
+                  .collection("bills")
+                  .withConverter(
+                    fromFirestore: Bill.fromFirestore,
+                    toFirestore: (bill, options) => bill.toFirestore(),
+                  )
+                  .add(bill);
             },
             icon: const Icon(Icons.share),
             label: const Text('Share this bill'),
