@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -39,6 +42,16 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
         future: _bill,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            final timestamp = snapshot.data?.timestamp;
+
+            if (timestamp == null) {
+              throw Exception('No timestamp');
+            }
+
+            final url = Uri.base.toString();
+            final expiration =
+                DateTime.parse(timestamp).add(const Duration(days: 30));
+
             return Card(
               margin: const EdgeInsets.all(32.0),
               child: Padding(
@@ -47,8 +60,20 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(widget.code),
-                    // Text(snapshot.data?.timestamp ?? 'No timestamp'),
+                    const Text('Share the link below:'),
+                    TextButton(
+                      onPressed: () async {
+                        Clipboard.setData(ClipboardData(text: url));
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Copied!'),
+                          ),
+                        );
+                      },
+                      child: Text(url),
+                    ),
+                    Text('Expires: ${DateFormat.yMMMMd().format(expiration)}'),
                     Text(snapshot.data?.title ?? 'No title'),
                     Text(snapshot.data?.description ?? 'No description'),
                     // TODO: Show expenses
@@ -144,9 +169,6 @@ class _CommentsState extends State<Comments> {
         ),
         const SizedBox(height: 8),
         for (final comment in widget.comments) CommentTile(comment: comment),
-        // for (final comment in widget.comments)
-        //   Text(
-        //       '${} ${comment.name ?? 'Anonymous'}: ${comment.text}'),
         const SizedBox(height: 8),
       ],
     );
