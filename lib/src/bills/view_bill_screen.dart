@@ -25,6 +25,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   @override
   void initState() {
     super.initState();
+    CommentService.setTestData();
     _bill = BillService.fetch(widget.code);
   }
 

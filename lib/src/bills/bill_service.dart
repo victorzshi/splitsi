@@ -52,7 +52,11 @@ class BillService {
     return bill;
   }
 
-  static Future<void> setExampleData() async {
+  static void setTestData() async {
+    final query = await collection.where("code", isEqualTo: "TEST").get();
+
+    if (query.docs.isNotEmpty) return;
+
     final timestamp = DateTime.now().toIso8601String();
 
     final testBill = Bill(

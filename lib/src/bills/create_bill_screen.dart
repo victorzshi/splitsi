@@ -22,6 +22,7 @@ class _CreateBillScreen extends State<CreateBillScreen> {
   @override
   void initState() {
     super.initState();
+    BillService.setTestData();
     _code = BillService.nextCode();
   }
 
