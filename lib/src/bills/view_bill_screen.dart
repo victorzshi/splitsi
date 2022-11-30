@@ -61,17 +61,20 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Share the link below:'),
-                    TextButton(
-                      onPressed: () async {
-                        Clipboard.setData(ClipboardData(text: url));
+                    Tooltip(
+                      message: 'Click to copy!',
+                      child: TextButton(
+                        onPressed: () async {
+                          Clipboard.setData(ClipboardData(text: url));
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Copied!'),
-                          ),
-                        );
-                      },
-                      child: Text(url),
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Copied!'),
+                            ),
+                          );
+                        },
+                        child: Text(url),
+                      ),
                     ),
                     Text('Expires: ${DateFormat.yMMMMd().format(expiration)}'),
                     Text(snapshot.data?.title ?? 'No title'),
