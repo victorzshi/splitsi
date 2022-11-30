@@ -38,17 +38,22 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
           future: _bill,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              final code = snapshot.data!.code as String;
+
               return ListView(
                 children: [
-                  Text(snapshot.data?.code ?? 'No code'),
+                  Text(code),
                   Text(snapshot.data?.title ?? 'No title'),
                   Text(snapshot.data?.description ?? 'No description'),
                   Text(snapshot.data?.timestamp ?? 'No timestamp'),
                   ChangeNotifierProvider(
-                    create: (context) => CommentsObservable(),
+                    create: (context) => CommentsObservable(code: code),
                     child: Consumer<CommentsObservable>(
                       builder: (context, comments, child) {
-                        return Comments(comments: comments.comments);
+                        return Comments(
+                          code: code,
+                          comments: comments.comments,
+                        );
                       },
                     ),
                   ),
@@ -67,8 +72,9 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
 }
 
 class Comments extends StatefulWidget {
-  const Comments({super.key, required this.comments});
+  const Comments({super.key, required this.code, required this.comments});
 
+  final String code;
   final List<Comment> comments;
 
   @override
@@ -111,6 +117,7 @@ class _CommentsState extends State<Comments> {
                       FirebaseFirestore.instance
                           .collection('comments')
                           .add(<String, dynamic>{
+                        'code': widget.code,
                         'name': 'Anonymous',
                         'text': _controller.text,
                         'timestamp': DateTime.now().toIso8601String(),
