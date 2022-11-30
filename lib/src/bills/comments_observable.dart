@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 import 'comment.dart';
+import 'comment_service.dart';
 
 class CommentsObservable extends ChangeNotifier {
   CommentsObservable({required this.code}) {
@@ -17,14 +18,7 @@ class CommentsObservable extends ChangeNotifier {
   List<Comment> get comments => _comments;
 
   void init() {
-    final db = FirebaseFirestore.instance;
-
-    _commentsSubscription = db
-        .collection("comments")
-        .withConverter(
-          fromFirestore: Comment.fromFirestore,
-          toFirestore: (comment, options) => comment.toFirestore(),
-        )
+    _commentsSubscription = CommentService.collection
         .where("code", isEqualTo: code)
         .orderBy("timestamp")
         .snapshots()

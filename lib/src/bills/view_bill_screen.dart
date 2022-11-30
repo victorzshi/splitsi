@@ -1,9 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'comment.dart';
+import 'comment_service.dart';
 import 'comments_observable.dart';
 import 'bill.dart';
 import 'bill_service.dart';
@@ -45,6 +45,8 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                   Text(snapshot.data?.timestamp ?? 'No timestamp'),
                   Text(snapshot.data?.title ?? 'No title'),
                   Text(snapshot.data?.description ?? 'No description'),
+                  // TODO: Show expenses
+                  const Text('Expenses placeholder'),
                   ChangeNotifierProvider(
                     create: (context) => CommentsObservable(code: widget.code),
                     child: Consumer<CommentsObservable>(
@@ -119,16 +121,7 @@ class _CommentsState extends State<Comments> {
                         text: _controller.text,
                       );
 
-                      final db = FirebaseFirestore.instance;
-
-                      await db
-                          .collection("comments")
-                          .withConverter(
-                            fromFirestore: Comment.fromFirestore,
-                            toFirestore: (comment, options) =>
-                                comment.toFirestore(),
-                          )
-                          .add(comment);
+                      CommentService.upload(comment);
 
                       _controller.clear();
                     }

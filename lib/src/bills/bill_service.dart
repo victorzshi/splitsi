@@ -5,69 +5,54 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'bill.dart';
 
 class BillService {
-  // Generate unique code
+  static final collection =
+      FirebaseFirestore.instance.collection("bills").withConverter(
+            fromFirestore: Bill.fromFirestore,
+            toFirestore: (bill, options) => bill.toFirestore(),
+          );
+
   static Future<String> nextCode() async {
+    var code = '';
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const length = 4;
 
-    var code = '';
+    Future<bool> isNotUniqueCode() async {
+      final query = await collection.where("code", isEqualTo: code).get();
+
+      return query.docs.isNotEmpty;
+    }
+
     do {
       for (var i = 0; i < length; i++) {
         final index = Random().nextInt(letters.length);
         code += letters[index];
       }
-    } while (await _isNotUniqueCode(code));
+    } while (await isNotUniqueCode());
 
     return code;
   }
 
-  // Add read-only bill to database
   static void upload(Bill bill) async {
-    final db = FirebaseFirestore.instance;
-
-    // TODO: Set data as read-only
-    await db
-        .collection("bills")
-        .withConverter(
-          fromFirestore: Bill.fromFirestore,
-          toFirestore: (bill, options) => bill.toFirestore(),
-        )
-        .add(bill);
+    await collection.add(bill);
   }
 
-  // Get single bill that has the unique code
   static Future<Bill> fetch(String code) async {
-    final db = FirebaseFirestore.instance;
+    final query = await collection.where("code", isEqualTo: code).get();
 
-    final query = db.collection("bills").where("code", isEqualTo: code);
-
-    final ref = query.withConverter(
-      fromFirestore: Bill.fromFirestore,
-      toFirestore: (bill, options) => bill.toFirestore(),
-    );
-
-    final querySnap = await ref.get();
-
-    if (querySnap.docs.isEmpty) {
+    if (query.docs.isEmpty) {
       throw Exception('Bill not found');
     }
 
-    if (querySnap.docs.length != 1) {
+    if (query.docs.length != 1) {
       throw Exception('Bill has non-unique code');
     }
 
-    final bill = querySnap.docs.first.data();
+    final bill = query.docs.first.data();
+
     return bill;
   }
 
   static Future<void> setExampleData() async {
-    final db = FirebaseFirestore.instance;
-
-    final billsRef = db.collection("bills").withConverter(
-          fromFirestore: Bill.fromFirestore,
-          toFirestore: (bill, options) => bill.toFirestore(),
-        );
-
     final timestamp = DateTime.now().toIso8601String();
 
     final testBill = Bill(
@@ -87,19 +72,9 @@ class BillService {
       timestamp: timestamp,
     );
 
-    await billsRef.doc('TEST').set(testBill);
-    await billsRef.doc('SAME1').set(sameBill);
-    await billsRef.doc('SAME2').set(sameBill);
-    await billsRef.doc('NULL').set(nullBill);
-  }
-
-  static Future<bool> _isNotUniqueCode(String code) async {
-    final db = FirebaseFirestore.instance;
-
-    final query = db.collection("bills").where("code", isEqualTo: code);
-
-    final querySnap = await query.get();
-
-    return querySnap.docs.isNotEmpty;
+    await collection.doc('TEST').set(testBill);
+    await collection.doc('SAME1').set(sameBill);
+    await collection.doc('SAME2').set(sameBill);
+    await collection.doc('NULL').set(nullBill);
   }
 }
