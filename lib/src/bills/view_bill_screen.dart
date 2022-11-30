@@ -35,39 +35,46 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
       appBar: AppBar(
         title: const Text('View a bill'),
       ),
-      body: Center(
-        child: FutureBuilder<Bill>(
-          future: _bill,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView(
-                children: [
-                  Text(widget.code),
-                  Text(snapshot.data?.timestamp ?? 'No timestamp'),
-                  Text(snapshot.data?.title ?? 'No title'),
-                  Text(snapshot.data?.description ?? 'No description'),
-                  // TODO: Show expenses
-                  const Text('Expenses placeholder'),
-                  ChangeNotifierProvider(
-                    create: (context) => CommentsObservable(code: widget.code),
-                    child: Consumer<CommentsObservable>(
-                      builder: (context, comments, child) {
-                        return Comments(
-                          code: widget.code,
-                          comments: comments.comments,
-                        );
-                      },
+      body: FutureBuilder<Bill>(
+        future: _bill,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Card(
+              margin: const EdgeInsets.all(32.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.code),
+                    // Text(snapshot.data?.timestamp ?? 'No timestamp'),
+                    Text(snapshot.data?.title ?? 'No title'),
+                    Text(snapshot.data?.description ?? 'No description'),
+                    // TODO: Show expenses
+                    const Text('Expenses placeholder'),
+                    ChangeNotifierProvider(
+                      create: (context) =>
+                          CommentsObservable(code: widget.code),
+                      child: Consumer<CommentsObservable>(
+                        builder: (context, comments, child) {
+                          return Comments(
+                            code: widget.code,
+                            comments: comments.comments,
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                ],
-              );
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
+                  ],
+                ),
+              ),
+            );
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          }
 
-            return const CircularProgressIndicator();
-          },
-        ),
+          return const CircularProgressIndicator();
+        },
       ),
     );
   }
@@ -97,6 +104,7 @@ class _CommentsState extends State<Comments> {
           child: Form(
             key: _formKey,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   child: TextFormField(
@@ -135,11 +143,32 @@ class _CommentsState extends State<Comments> {
           ),
         ),
         const SizedBox(height: 8),
-        for (final comment in widget.comments)
-          Text(
-              '${DateFormat.yMMMMd().add_jm().format(DateTime.parse(comment.timestamp ?? ''))} ${comment.name ?? 'Anonymous'}: ${comment.text}'),
+        for (final comment in widget.comments) CommentTile(comment: comment),
+        // for (final comment in widget.comments)
+        //   Text(
+        //       '${} ${comment.name ?? 'Anonymous'}: ${comment.text}'),
         const SizedBox(height: 8),
       ],
+    );
+  }
+}
+
+class CommentTile extends StatelessWidget {
+  const CommentTile({super.key, required this.comment});
+
+  final Comment comment;
+
+  @override
+  Widget build(BuildContext context) {
+    final title = '${comment.name ?? 'Anonymous'}: ${comment.text ?? ''}';
+    final subtitle = DateFormat.yMMMMd()
+        .add_jm()
+        .format(DateTime.parse(comment.timestamp ?? ''));
+
+    return ListTile(
+      leading: const FlutterLogo(size: 32.0),
+      title: Text(title),
+      subtitle: Text(subtitle),
     );
   }
 }
