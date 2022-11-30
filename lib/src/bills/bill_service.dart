@@ -60,7 +60,7 @@ class BillService {
     return bill;
   }
 
-  static Future<void> setDummyData() async {
+  static Future<void> setExampleData() async {
     final db = FirebaseFirestore.instance;
 
     final billsRef = db.collection("bills").withConverter(
@@ -68,17 +68,23 @@ class BillService {
           toFirestore: (bill, options) => bill.toFirestore(),
         );
 
+    final timestamp = DateTime.now().toIso8601String();
+
     final testBill = Bill(
       code: 'TEST',
+      timestamp: timestamp,
       title: 'Test bill',
-      description: 'Dummy data',
-      timestamp: 'YYYY-MM-DDThh:mm:ss.s',
+      description: 'Contains dummy data',
     );
     final sameBill = Bill(
       code: 'SAME',
+      timestamp: timestamp,
+      title: 'Non-unique bill',
+      description: 'Should throw exception',
     );
     final nullBill = Bill(
       code: 'NULL',
+      timestamp: timestamp,
     );
 
     await billsRef.doc('TEST').set(testBill);

@@ -1,28 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Bill {
-  Bill({
+class Comment {
+  Comment({
     required this.code,
     required this.timestamp,
-    this.title,
-    this.description,
+    this.name,
+    this.text,
   });
 
   final String? code;
   final String? timestamp;
-  final String? title;
-  final String? description;
+  final String? name;
+  final String? text;
 
-  factory Bill.fromFirestore(
+  factory Comment.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? options,
   ) {
     final data = snapshot.data();
-    return Bill(
+    return Comment(
       code: data?['code'],
       timestamp: data?['timestamp'],
-      title: data?['title'],
-      description: data?['description'],
+      name: data?['name'],
+      text: data?['text'],
     );
   }
 
@@ -30,8 +30,8 @@ class Bill {
     return {
       if (code != null) "code": code,
       if (timestamp != null) "timestamp": timestamp,
-      if (title != null) "title": title,
-      if (description != null) "description": description,
+      if (name != null) "name": name,
+      if (text != null) "text": text,
     };
   }
 }

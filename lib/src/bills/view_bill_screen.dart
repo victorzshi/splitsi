@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import 'comment.dart';
 import 'comments_observable.dart';
 import 'bill.dart';
 import 'bill_service.dart';
@@ -38,20 +39,18 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
           future: _bill,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              final code = snapshot.data!.code as String;
-
               return ListView(
                 children: [
-                  Text(code),
+                  Text(widget.code),
+                  Text(snapshot.data?.timestamp ?? 'No timestamp'),
                   Text(snapshot.data?.title ?? 'No title'),
                   Text(snapshot.data?.description ?? 'No description'),
-                  Text(snapshot.data?.timestamp ?? 'No timestamp'),
                   ChangeNotifierProvider(
-                    create: (context) => CommentsObservable(code: code),
+                    create: (context) => CommentsObservable(code: widget.code),
                     child: Consumer<CommentsObservable>(
                       builder: (context, comments, child) {
                         return Comments(
-                          code: code,
+                          code: widget.code,
                           comments: comments.comments,
                         );
                       },
@@ -114,14 +113,23 @@ class _CommentsState extends State<Comments> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      FirebaseFirestore.instance
-                          .collection('comments')
-                          .add(<String, dynamic>{
-                        'code': widget.code,
-                        'name': 'Anonymous',
-                        'text': _controller.text,
-                        'timestamp': DateTime.now().toIso8601String(),
-                      });
+                      final comment = Comment(
+                        code: widget.code,
+                        timestamp: DateTime.now().toIso8601String(),
+                        text: _controller.text,
+                      );
+
+                      final db = FirebaseFirestore.instance;
+
+                      await db
+                          .collection("comments")
+                          .withConverter(
+                            fromFirestore: Comment.fromFirestore,
+                            toFirestore: (comment, options) =>
+                                comment.toFirestore(),
+                          )
+                          .add(comment);
+
                       _controller.clear();
                     }
                   },
@@ -135,7 +143,7 @@ class _CommentsState extends State<Comments> {
         const SizedBox(height: 8),
         for (final comment in widget.comments)
           Text(
-              '${DateFormat.yMMMMd().add_jm().format(DateTime.parse(comment.timestamp ?? ''))} ${comment.name}: ${comment.text}'),
+              '${DateFormat.yMMMMd().add_jm().format(DateTime.parse(comment.timestamp ?? ''))} ${comment.name ?? 'Anonymous'}: ${comment.text}'),
         const SizedBox(height: 8),
       ],
     );
