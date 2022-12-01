@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,7 +7,9 @@ import 'package:provider/provider.dart';
 
 import '../../models/bill.dart';
 import '../../models/comment.dart';
-import 'comment_provider.dart';
+import '../../models/expense.dart';
+import '../../widgets/expense_card.dart';
+import 'subscription_provider.dart';
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
@@ -25,7 +28,11 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   @override
   void initState() {
     super.initState();
-    CommentService.setTestData();
+    if (kDebugMode) {
+      BillService.setTestData();
+      ExpenseService.setTestData();
+      CommentService.setTestData();
+    }
     _bill = BillService.fetch(widget.code);
   }
 
@@ -76,11 +83,24 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                     Text('Expires: ${DateFormat.yMMMMd().format(expiration)}'),
                     Text(snapshot.data?.title ?? 'No title'),
                     Text(snapshot.data?.description ?? 'No description'),
-                    // TODO: Show expenses.
-                    const Text('Expenses placeholder'),
                     ChangeNotifierProvider(
-                      create: (context) => CommentProvider(code: widget.code),
-                      child: Consumer<CommentProvider>(
+                      create: (context) =>
+                          SubscriptionProvider(code: widget.code),
+                      child: Consumer<SubscriptionProvider>(
+                        builder: (context, provider, child) {
+                          return Column(
+                            children: [
+                              for (final expense in provider.expenses)
+                                ExpenseCard(expense: expense),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                    ChangeNotifierProvider(
+                      create: (context) =>
+                          SubscriptionProvider(code: widget.code),
+                      child: Consumer<SubscriptionProvider>(
                         builder: (context, provider, child) {
                           return CommentListView(
                             code: widget.code,
@@ -96,7 +116,6 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
-
           return const CircularProgressIndicator();
         },
       ),

@@ -66,7 +66,7 @@ class BillService {
     return code;
   }
 
-  static void upload(Bill bill) async {
+  static Future<void> upload(Bill bill) async {
     await collection.add(bill);
   }
 
@@ -86,7 +86,7 @@ class BillService {
     return bill;
   }
 
-  static void setTestData() async {
+  static Future<void> setTestData() async {
     const code = 'TEST';
     final query = await collection.where('code', isEqualTo: code).get();
 

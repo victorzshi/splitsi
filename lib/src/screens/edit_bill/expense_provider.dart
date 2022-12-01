@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import '../../models/expense.dart';
 
 class ExpenseProvider extends ChangeNotifier {
-  ExpenseProvider() {
+  ExpenseProvider({required this.code}) {
     if (kDebugMode) {
       // Generate dummy data
       final things = ['Taxi', 'Food', 'Drinks'];
@@ -27,6 +27,7 @@ class ExpenseProvider extends ChangeNotifier {
         if (people.isEmpty) people.add(names[Random().nextInt(names.length)]);
 
         _expenses.add(Expense(
+          code: code,
           title: title,
           amount: amount,
           people: people,
@@ -34,6 +35,8 @@ class ExpenseProvider extends ChangeNotifier {
       }
     }
   }
+
+  final String code;
 
   UnmodifiableListView<Expense> get expenses => UnmodifiableListView(_expenses);
   final List<Expense> _expenses = [];

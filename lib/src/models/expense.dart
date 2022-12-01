@@ -22,7 +22,7 @@ class Expense {
       code: data?['code'],
       title: data?['title'],
       amount: data?['amount'],
-      people: data?['people'],
+      people: (data?['people'] as List).map((e) => e as String).toList(),
     );
   }
 
@@ -43,27 +43,39 @@ class ExpenseService {
             toFirestore: (expense, options) => expense.toFirestore(),
           );
 
-  static void upload(Expense expense) async {
-    await collection.add(expense);
-  }
-
-  static Future<List<Expense>> fetch(String code) async {
-    final query = await collection.where('code', isEqualTo: code).get();
-
-    if (query.docs.isEmpty) {
-      throw Exception('Expenses not found');
+  static Future<void> upload(List<Expense> expenses) async {
+    for (final expense in expenses) {
+      await collection.add(expense);
     }
-
-    // TODO: Return list of expenses.
-    return [];
   }
 
-  static void setTestData() async {
+  static Future<void> setTestData() async {
     const code = 'TEST';
     final query = await collection.where('code', isEqualTo: code).get();
 
     if (query.docs.isNotEmpty) return;
 
-    // TODO: Add test data.
+    final firstExpense = Expense(
+      code: code,
+      title: 'Taxi',
+      amount: 7.20,
+      people: ['Ash', 'Misty', 'Brock', 'May', 'Dawn', 'Gary'],
+    );
+    final secondExpense = Expense(
+      code: code,
+      title: 'Food',
+      amount: 37.93,
+      people: ['Ash', 'May', 'Dawn', 'Gary'],
+    );
+    final thirdExpense = Expense(
+      code: code,
+      title: 'Drinks',
+      amount: 12,
+      people: ['Ash', 'Misty', 'Brock', 'May'],
+    );
+
+    await collection.add(firstExpense);
+    await collection.add(secondExpense);
+    await collection.add(thirdExpense);
   }
 }

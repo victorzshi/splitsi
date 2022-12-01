@@ -43,11 +43,11 @@ class CommentService {
             toFirestore: (comment, options) => comment.toFirestore(),
           );
 
-  static void upload(Comment comment) async {
+  static Future<void> upload(Comment comment) async {
     await collection.add(comment);
   }
 
-  static void setTestData() async {
+  static Future<void> setTestData() async {
     const code = 'TEST';
     final query = await collection.where('code', isEqualTo: code).get();
 

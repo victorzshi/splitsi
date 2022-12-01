@@ -28,7 +28,6 @@ class _CreateBillScreen extends State<EditBillScreen> {
   @override
   void initState() {
     super.initState();
-    BillService.setTestData();
     _code = BillService.nextCode();
   }
 
@@ -39,111 +38,136 @@ class _CreateBillScreen extends State<EditBillScreen> {
     super.dispose();
   }
 
+  List<String> _getExistingPeople(List<Expense> expenses) {
+    final uniquePeople = <String>{};
+
+    for (final expense in expenses) {
+      if (expense.people != null) {
+        uniquePeople.addAll(expense.people!);
+      }
+    }
+
+    final people = List.from(uniquePeople);
+    people.sort();
+
+    return List.from(people);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('New bill'),
       ),
-      body: ChangeNotifierProvider(
-        create: (context) => ExpenseProvider(),
-        child: Consumer<ExpenseProvider>(
-          builder: (context, provider, child) {
-            return ListView(
-              padding: const EdgeInsets.all(8.0),
-              children: <Widget>[
-                Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _titleController,
-                        decoration: const InputDecoration(
-                          labelText: 'Title',
-                          hintText: 'What is this bill?',
-                        ),
-                        textCapitalization: TextCapitalization.sentences,
-                        validator: (text) {
-                          text = text?.trim();
-                          if (text == null || text.isEmpty) {
-                            return 'Please enter a title.';
-                          }
-                          _titleController.text = text;
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: _descriptionController,
-                        decoration: const InputDecoration(
-                          labelText: 'Description (optional)',
-                          hintText: 'Any other details?',
-                        ),
-                        textCapitalization: TextCapitalization.sentences,
-                        validator: (text) {
-                          text = text?.trim();
-                          if (text != null) {
-                            _descriptionController.text = text;
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                NewExpenseButton(expenses: provider.expenses),
-                const SizedBox(height: 8.0),
-                const Divider(),
-                for (final expense in provider.expenses)
-                  ExpenseCard(expense: expense),
-              ],
-            );
-          },
-        ),
-      ),
-      floatingActionButton: FutureBuilder<String>(
+      body: FutureBuilder<String>(
         future: _code,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            // TODO: Show share button only if at least one expense exists.
-            return FloatingActionButton.extended(
-              onPressed: () {
-                // TODO: Confirm with user that data is finalized.
+            final code = snapshot.data as String;
 
-                if (_formKey.currentState!.validate()) {
-                  final code = snapshot.data as String;
-                  final timestamp = DateTime.now().toIso8601String();
-                  final title = _titleController.text.isNotEmpty
-                      ? _titleController.text
-                      : null;
-                  final description = _descriptionController.text.isNotEmpty
-                      ? _descriptionController.text
-                      : null;
+            return ChangeNotifierProvider(
+              create: (context) => ExpenseProvider(code: code),
+              child: Consumer<ExpenseProvider>(
+                builder: (context, provider, child) {
+                  return ListView(
+                    padding: const EdgeInsets.all(8.0),
+                    children: <Widget>[
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: _titleController,
+                              decoration: const InputDecoration(
+                                labelText: 'Title',
+                                hintText: 'What is this bill?',
+                              ),
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (text) {
+                                text = text?.trim();
+                                if (text == null || text.isEmpty) {
+                                  return 'Please enter a title.';
+                                }
+                                _titleController.text = text;
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              controller: _descriptionController,
+                              decoration: const InputDecoration(
+                                labelText: 'Description (optional)',
+                                hintText: 'Any other details?',
+                              ),
+                              textCapitalization: TextCapitalization.sentences,
+                              validator: (text) {
+                                text = text?.trim();
+                                if (text != null) {
+                                  _descriptionController.text = text;
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      for (final expense in provider.expenses)
+                        ExpenseCard(expense: expense),
+                      const Divider(),
+                      const SizedBox(height: 8.0),
+                      NewExpenseButton(
+                        code: code,
+                        people: _getExistingPeople(provider.expenses),
+                      ),
+                      const SizedBox(height: 8.0),
+                      if (provider.expenses.isNotEmpty)
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            // TODO: Confirm with user that data is finalized.
 
-                  final bill = Bill(
-                    code: code,
-                    timestamp: timestamp,
-                    title: title,
-                    description: description,
+                            if (_formKey.currentState!.validate()) {
+                              // final code = snapshot.data as String;
+                              final timestamp =
+                                  DateTime.now().toIso8601String();
+                              final title = _titleController.text.isNotEmpty
+                                  ? _titleController.text
+                                  : null;
+                              final description =
+                                  _descriptionController.text.isNotEmpty
+                                      ? _descriptionController.text
+                                      : null;
+
+                              final bill = Bill(
+                                code: code,
+                                timestamp: timestamp,
+                                title: title,
+                                description: description,
+                              );
+
+                              BillService.upload(bill);
+                              ExpenseService.upload(provider.expenses);
+
+                              Navigator.restorablePopAndPushNamed(
+                                context,
+                                '${ViewBillScreen.routeName}/$code',
+                              );
+                            }
+                          },
+                          icon: const Icon(Icons.share),
+                          label: const Text('Share bill'),
+                        )
+                    ],
                   );
-
-                  BillService.upload(bill);
-
-                  // TODO: Add code to all expenses and upload.
-
-                  Navigator.restorablePopAndPushNamed(
-                    context,
-                    '${ViewBillScreen.routeName}/$code',
-                  );
-                }
-              },
-              icon: const Icon(Icons.share),
-              label: const Text('Share bill'),
+                },
+              ),
             );
           } else if (snapshot.hasError) {
-            return Text('${snapshot.error}');
+            return Center(
+              child: Text('${snapshot.error}'),
+            );
           }
-          return const CircularProgressIndicator();
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
@@ -151,9 +175,10 @@ class _CreateBillScreen extends State<EditBillScreen> {
 }
 
 class NewExpenseButton extends StatefulWidget {
-  const NewExpenseButton({super.key, required this.expenses});
+  const NewExpenseButton({super.key, required this.code, required this.people});
 
-  final List<Expense> expenses;
+  final String code;
+  final List<String> people;
 
   @override
   State<NewExpenseButton> createState() => _NewExpenseButtonState();
@@ -171,28 +196,16 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
     );
   }
 
-  List<String> _getExistingPeople() {
-    final uniquePeople = <String>{};
-
-    for (final expense in widget.expenses) {
-      if (expense.people != null) {
-        uniquePeople.addAll(expense.people!);
-      }
-    }
-
-    final people = List.from(uniquePeople);
-    people.sort();
-
-    return List.from(people);
-  }
-
   Future<void> _navigateAndDisplayExpense(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
         // TODO: Edit existing expense.
         return EditExpenseScreen(
-          expense: Expense(people: _getExistingPeople()),
+          expense: Expense(
+            code: widget.code,
+            people: widget.people,
+          ),
         );
       }),
     );

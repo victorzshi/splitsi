@@ -115,6 +115,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        final code = widget.expense.code!;
                         final title = _titleController.text;
                         final amount = double.parse(_amountController.text);
                         final people =
@@ -122,6 +123,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                         people.sort();
 
                         final expense = Expense(
+                          code: code,
                           title: title,
                           amount: amount,
                           people: people,
