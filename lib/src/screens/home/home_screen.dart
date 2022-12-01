@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../bills/create_bill_screen.dart';
+import '../create_bill/create_bill_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

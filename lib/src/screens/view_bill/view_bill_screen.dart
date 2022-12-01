@@ -1,15 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import 'comment.dart';
-import 'comment_service.dart';
+import '../models/bill.dart';
+import '../models/comment.dart';
 import 'comments_observable.dart';
-import 'bill.dart';
-import 'bill_service.dart';
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});

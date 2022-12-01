@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'bills/create_bill_screen.dart';
-import 'bills/view_bill_screen.dart';
+import 'create_bill/create_bill_screen.dart';
 import 'home/home_screen.dart';
+import 'view_bill/view_bill_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});

@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-import 'comment.dart';
-import 'comment_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import '../models/comment.dart';
 
 class CommentsObservable extends ChangeNotifier {
   CommentsObservable({required this.code}) {

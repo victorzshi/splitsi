@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'bill.dart';
-import 'bill_service.dart';
-import 'view_bill_screen.dart';
+import '../models/bill.dart';
+import '../view_bill/view_bill_screen.dart';
 
 class CreateBillScreen extends StatefulWidget {
   const CreateBillScreen({super.key});
