@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../models/comment.dart';
+import '../../models/comment.dart';
 
 class CommentsObservable extends ChangeNotifier {
   CommentsObservable({required this.code}) {

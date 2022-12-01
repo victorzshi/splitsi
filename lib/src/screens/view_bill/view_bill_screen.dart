@@ -4,8 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../models/bill.dart';
-import '../models/comment.dart';
+import '../../models/bill.dart';
+import '../../models/comment.dart';
 import 'comments_observable.dart';
 
 class ViewBillScreen extends StatefulWidget {
