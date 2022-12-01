@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/bill.dart';
 import '../../models/comment.dart';
-import 'comments_notifier.dart';
+import 'comment_provider.dart';
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
@@ -79,12 +79,12 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                     // TODO: Show expenses.
                     const Text('Expenses placeholder'),
                     ChangeNotifierProvider(
-                      create: (context) => CommentsNotifier(code: widget.code),
-                      child: Consumer<CommentsNotifier>(
-                        builder: (context, comments, child) {
-                          return Comments(
+                      create: (context) => CommentProvider(code: widget.code),
+                      child: Consumer<CommentProvider>(
+                        builder: (context, provider, child) {
+                          return CommentListView(
                             code: widget.code,
-                            comments: comments.comments,
+                            comments: provider.comments,
                           );
                         },
                       ),
@@ -104,17 +104,21 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   }
 }
 
-class Comments extends StatefulWidget {
-  const Comments({super.key, required this.code, required this.comments});
+class CommentListView extends StatefulWidget {
+  const CommentListView({
+    super.key,
+    required this.code,
+    required this.comments,
+  });
 
   final String code;
   final List<Comment> comments;
 
   @override
-  State<Comments> createState() => _CommentsState();
+  State<CommentListView> createState() => _CommentListViewState();
 }
 
-class _CommentsState extends State<Comments> {
+class _CommentListViewState extends State<CommentListView> {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController();
 

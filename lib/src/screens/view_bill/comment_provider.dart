@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/comment.dart';
 
-class CommentsNotifier extends ChangeNotifier {
-  CommentsNotifier({required this.code}) {
+class CommentProvider extends ChangeNotifier {
+  CommentProvider({required this.code}) {
     init();
   }
 

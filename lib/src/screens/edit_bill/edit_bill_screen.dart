@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import '../../models/bill.dart';
 import '../../models/expense.dart';
 import '../../widgets/expense_card.dart';
 import '../edit_expense/edit_expense_screen.dart';
 import '../view_bill/view_bill_screen.dart';
+import 'expense_provider.dart';
 
 class EditBillScreen extends StatefulWidget {
   const EditBillScreen({super.key});
@@ -27,30 +30,26 @@ class _CreateBillScreen extends State<EditBillScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final expenses = <Expense>[];
-
-    expenses.add(Expense(
-      title: 'Taxi',
-      amount: 10,
-      people: ['Ash', 'May', 'Brock', 'Misty'],
-    ));
-
-    expenses.add(Expense(
-      title: 'Food',
-      amount: 17.50,
-      people: ['Ash', 'May', 'Brock'],
-    ));
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('New bill'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(8.0),
-        children: <Widget>[
-          for (final expense in expenses) ExpenseCard(expense: expense),
-          const NewExpenseButton(),
-        ],
+      body: ChangeNotifierProvider(
+        create: (context) => ExpenseProvider(),
+        child: Consumer<ExpenseProvider>(
+          builder: (context, provider, child) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  for (final expense in provider.expenses)
+                    ExpenseCard(expense: expense),
+                  const NewExpenseButton(),
+                ],
+              ),
+            );
+          },
+        ),
       ),
       floatingActionButton: FutureBuilder<String>(
         future: _code,
@@ -130,10 +129,14 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
     // must be checked after an asynchronous gap.
     if (!mounted) return;
 
-    final expense = result as Expense?;
+    if (result != null) {
+      final expense = result as Expense;
 
-    ScaffoldMessenger.of(context)
-      ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('${expense?.title}')));
+      Provider.of<ExpenseProvider>(context, listen: false).add(expense);
+
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text('Added "${expense.title}"')));
+    }
   }
 }
