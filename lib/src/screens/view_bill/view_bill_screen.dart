@@ -118,7 +118,9 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
-          return const CircularProgressIndicator();
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
         },
       ),
     );
@@ -151,7 +153,7 @@ class SplitResults extends StatelessWidget {
     return Column(
       children: <Widget>[
         const Text('Split Results'),
-        Wrap(
+        Row(
           children: [
             for (final item in map.entries)
               Expanded(
