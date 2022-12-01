@@ -151,20 +151,25 @@ class SplitResults extends StatelessWidget {
     return Column(
       children: <Widget>[
         const Text('Split Results'),
-        Row(
+        Wrap(
           children: [
             for (final item in map.entries)
               Expanded(
                 child: Column(
                   children: [
-                    Chip(
-                      avatar: CircleAvatar(
-                        backgroundColor:
-                            ExpenseService.convertToColor(item.key),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8.0,
+                        horizontal: 2.0,
                       ),
-                      label: Text(item.key),
+                      child: Chip(
+                        avatar: CircleAvatar(
+                          backgroundColor:
+                              ExpenseService.convertToColor(item.key),
+                        ),
+                        label: Text(item.key),
+                      ),
                     ),
-                    const SizedBox(height: 8.0),
                     Text('\$${item.value.toStringAsFixed(2)}'),
                   ],
                 ),
