@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../../models/expense.dart';
 
 class EditExpenseScreen extends StatefulWidget {
-  const EditExpenseScreen({super.key});
+  const EditExpenseScreen({super.key, required this.expense});
+
+  final Expense expense;
 
   @override
   State<EditExpenseScreen> createState() => _EditExpenseScreenState();
@@ -14,6 +16,15 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   final _peopleController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final people = widget.expense.people;
+    if (people != null && people.isNotEmpty) {
+      _peopleController.text = people.join(', ');
+    }
+  }
 
   @override
   void dispose() {
@@ -64,8 +75,12 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                     if (text == null || text.isEmpty) {
                       return 'Please enter a number.';
                     }
-                    if (double.tryParse(text) == null) {
-                      return 'Please enter a valid integer or decimal.';
+                    final value = double.tryParse(text);
+                    if (value == null) {
+                      return 'Please enter a integer or decimal.';
+                    }
+                    if (value <= 0) {
+                      return 'Please enter a positive non-zero value.';
                     }
                     _amountController.text = text;
                     return null;
@@ -104,6 +119,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                         final amount = double.parse(_amountController.text);
                         final people =
                             _peopleController.text.split(', ').toList();
+                        people.sort();
 
                         final expense = Expense(
                           title: title,

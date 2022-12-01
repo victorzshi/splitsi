@@ -14,8 +14,8 @@ class CommentProvider extends ChangeNotifier {
   final String code;
 
   StreamSubscription<QuerySnapshot>? _commentsSubscription;
-  final List<Comment> _comments = [];
   List<Comment> get comments => _comments;
+  final List<Comment> _comments = [];
 
   void init() {
     _commentsSubscription = CommentService.collection

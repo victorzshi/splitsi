@@ -7,31 +7,36 @@ import '../../models/expense.dart';
 
 class ExpenseProvider extends ChangeNotifier {
   ExpenseProvider() {
-    if (!kReleaseMode) {
-      final people = ['Ash', 'Misty', 'Brock', 'May', 'Dawn', 'Gary'];
+    if (kDebugMode) {
+      // Generate dummy data
+      final things = ['Taxi', 'Food', 'Drinks'];
+      final names = ['Ash', 'Misty', 'Brock', 'May', 'Dawn', 'Gary'];
 
-      _expenses.add(Expense(
-        title: 'Taxi',
-        amount: Random().nextDouble() * 100,
-        people: people.sublist(Random().nextInt(people.length)),
-      ));
+      final count = Random().nextInt(2) + 3;
+      for (var i = 0; i < count; i++) {
+        final title = things[Random().nextInt(things.length)];
 
-      _expenses.add(Expense(
-        title: 'Food',
-        amount: Random().nextInt(100) as double,
-        people: people.sublist(Random().nextInt(people.length)),
-      ));
+        final amount = Random().nextDouble() * 99 + 1;
 
-      _expenses.add(Expense(
-        title: 'Drinks',
-        amount: Random().nextDouble() * 100,
-        people: people.sublist(Random().nextInt(people.length)),
-      ));
+        final people = <String>[];
+        for (final name in names) {
+          if (Random().nextBool()) {
+            people.add(name);
+          }
+        }
+        if (people.isEmpty) people.add(names[Random().nextInt(names.length)]);
+
+        _expenses.add(Expense(
+          title: title,
+          amount: amount,
+          people: people,
+        ));
+      }
     }
   }
 
-  final List<Expense> _expenses = [];
   UnmodifiableListView<Expense> get expenses => UnmodifiableListView(_expenses);
+  final List<Expense> _expenses = [];
 
   void add(Expense expense) {
     _expenses.add(expense);

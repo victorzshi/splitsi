@@ -91,7 +91,7 @@ class _CreateBillScreen extends State<EditBillScreen> {
                   ),
                 ),
                 const SizedBox(height: 8.0),
-                const NewExpenseButton(),
+                NewExpenseButton(expenses: provider.expenses),
                 const SizedBox(height: 8.0),
                 const Divider(),
                 for (final expense in provider.expenses)
@@ -151,7 +151,9 @@ class _CreateBillScreen extends State<EditBillScreen> {
 }
 
 class NewExpenseButton extends StatefulWidget {
-  const NewExpenseButton({super.key});
+  const NewExpenseButton({super.key, required this.expenses});
+
+  final List<Expense> expenses;
 
   @override
   State<NewExpenseButton> createState() => _NewExpenseButtonState();
@@ -169,10 +171,30 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
     );
   }
 
+  List<String> _getExistingPeople() {
+    final uniquePeople = <String>{};
+
+    for (final expense in widget.expenses) {
+      if (expense.people != null) {
+        uniquePeople.addAll(expense.people!);
+      }
+    }
+
+    final people = List.from(uniquePeople);
+    people.sort();
+
+    return List.from(people);
+  }
+
   Future<void> _navigateAndDisplayExpense(BuildContext context) async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const EditExpenseScreen()),
+      MaterialPageRoute(builder: (context) {
+        // TODO: Edit existing expense.
+        return EditExpenseScreen(
+          expense: Expense(people: _getExistingPeople()),
+        );
+      }),
     );
 
     // When a BuildContext is used from a StatefulWidget, the mounted property
