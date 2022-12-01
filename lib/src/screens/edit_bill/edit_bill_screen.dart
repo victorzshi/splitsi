@@ -19,6 +19,10 @@ class EditBillScreen extends StatefulWidget {
 }
 
 class _CreateBillScreen extends State<EditBillScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
   late Future<String> _code;
 
   @override
@@ -26,6 +30,13 @@ class _CreateBillScreen extends State<EditBillScreen> {
     super.initState();
     BillService.setTestData();
     _code = BillService.nextCode();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -38,15 +49,54 @@ class _CreateBillScreen extends State<EditBillScreen> {
         create: (context) => ExpenseProvider(),
         child: Consumer<ExpenseProvider>(
           builder: (context, provider, child) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  for (final expense in provider.expenses)
-                    ExpenseCard(expense: expense),
-                  const NewExpenseButton(),
-                ],
-              ),
+            return ListView(
+              padding: const EdgeInsets.all(8.0),
+              children: <Widget>[
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Title',
+                          hintText: 'What is this bill?',
+                        ),
+                        textCapitalization: TextCapitalization.sentences,
+                        validator: (text) {
+                          text = text?.trim();
+                          if (text == null || text.isEmpty) {
+                            return 'Please enter a title.';
+                          }
+                          _titleController.text = text;
+                          return null;
+                        },
+                      ),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Description (optional)',
+                          hintText: 'Any other details?',
+                        ),
+                        textCapitalization: TextCapitalization.sentences,
+                        validator: (text) {
+                          text = text?.trim();
+                          if (text != null) {
+                            _descriptionController.text = text;
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                const NewExpenseButton(),
+                const SizedBox(height: 8.0),
+                const Divider(),
+                for (final expense in provider.expenses)
+                  ExpenseCard(expense: expense),
+              ],
             );
           },
         ),
@@ -56,46 +106,46 @@ class _CreateBillScreen extends State<EditBillScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             // TODO: Show share button only if at least one expense exists.
-            return ShareBillButton(code: snapshot.data as String);
+            return FloatingActionButton.extended(
+              onPressed: () {
+                // TODO: Confirm with user that data is finalized.
+
+                if (_formKey.currentState!.validate()) {
+                  final code = snapshot.data as String;
+                  final timestamp = DateTime.now().toIso8601String();
+                  final title = _titleController.text.isNotEmpty
+                      ? _titleController.text
+                      : null;
+                  final description = _descriptionController.text.isNotEmpty
+                      ? _descriptionController.text
+                      : null;
+
+                  final bill = Bill(
+                    code: code,
+                    timestamp: timestamp,
+                    title: title,
+                    description: description,
+                  );
+
+                  BillService.upload(bill);
+
+                  // TODO: Add code to all expenses and upload.
+
+                  Navigator.restorablePopAndPushNamed(
+                    context,
+                    '${ViewBillScreen.routeName}/$code',
+                  );
+                }
+              },
+              icon: const Icon(Icons.share),
+              label: const Text('Share bill'),
+            );
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           }
           return const CircularProgressIndicator();
         },
       ),
-    );
-  }
-}
-
-class ShareBillButton extends StatelessWidget {
-  const ShareBillButton({super.key, required this.code});
-
-  final String code;
-
-  @override
-  Widget build(BuildContext context) {
-    return FloatingActionButton.extended(
-      onPressed: () {
-        // TODO: Confirm with user that data is finalized.
-
-        final timestamp = DateTime.now().toIso8601String();
-
-        final bill = Bill(
-          code: code,
-          timestamp: timestamp,
-        );
-
-        BillService.upload(bill);
-
-        // TODO: Add code to all expenses and upload.
-
-        Navigator.restorablePopAndPushNamed(
-          context,
-          '${ViewBillScreen.routeName}/$code',
-        );
-      },
-      icon: const Icon(Icons.share),
-      label: const Text('Share bill'),
     );
   }
 }
@@ -136,7 +186,9 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
 
       ScaffoldMessenger.of(context)
         ..removeCurrentSnackBar()
-        ..showSnackBar(SnackBar(content: Text('Added "${expense.title}"')));
+        ..showSnackBar(SnackBar(
+          content: Text('Added "${expense.title}" expense'),
+        ));
     }
   }
 }
