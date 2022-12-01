@@ -40,7 +40,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View a bill'),
+        title: const Text('View bill'),
       ),
       body: FutureBuilder<Bill>(
         future: _bill,
