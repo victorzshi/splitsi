@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../auth_provider.dart';
 import '../../models/bill.dart';
 import '../../models/comment.dart';
 import '../../models/expense.dart';
@@ -97,18 +98,11 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                           const Divider(),
                           SplitResults(expenses: provider.expenses),
                           const Divider(),
+                          CommentListView(
+                            code: widget.code,
+                            comments: provider.comments,
+                          )
                         ],
-                      );
-                    },
-                  ),
-                ),
-                ChangeNotifierProvider(
-                  create: (context) => SubscriptionProvider(code: widget.code),
-                  child: Consumer<SubscriptionProvider>(
-                    builder: (context, provider, child) {
-                      return CommentListView(
-                        code: widget.code,
-                        comments: provider.comments,
                       );
                     },
                   ),
@@ -234,10 +228,14 @@ class _CommentListViewState extends State<CommentListView> {
                     if (_formKey.currentState!.validate()) {
                       final code = widget.code;
                       final timestamp = DateTime.now().toIso8601String();
+                      final name =
+                          Provider.of<AuthProvider>(context, listen: false)
+                              .name;
                       final text = _commentController.text;
 
                       final comment = Comment(
                         code: code,
+                        name: name,
                         timestamp: timestamp,
                         text: text,
                       );

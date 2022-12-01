@@ -11,7 +11,7 @@ class ProfileButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, provider, child) {
-        if (provider.user != null) {
+        if (provider.signedIn) {
           return TextButton(
             onPressed: () {
               Navigator.restorablePushNamed(context, '/profile');

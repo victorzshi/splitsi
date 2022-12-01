@@ -51,6 +51,9 @@ class App extends StatelessWidget {
         }),
         '/profile': (context) {
           return ProfileScreen(
+            appBar: AppBar(
+              title: const Text('Splitsi'),
+            ),
             actions: [
               SignedOutAction((context) {
                 Navigator.popUntil(context, ModalRoute.withName('/'));

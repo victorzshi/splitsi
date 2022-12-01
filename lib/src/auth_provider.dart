@@ -11,8 +11,11 @@ class AuthProvider extends ChangeNotifier {
     init();
   }
 
-  User? get user => _user;
-  User? _user;
+  bool get signedIn => _signedIn;
+  bool _signedIn = false;
+
+  // TODO: Add user collection in database.
+  String? get name => FirebaseAuth.instance.currentUser?.displayName;
 
   Future<void> init() async {
     await Firebase.initializeApp(
@@ -24,7 +27,11 @@ class AuthProvider extends ChangeNotifier {
     ]);
 
     FirebaseAuth.instance.userChanges().listen((user) {
-      _user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        _signedIn = true;
+      } else {
+        _signedIn = false;
+      }
       notifyListeners();
     });
   }
