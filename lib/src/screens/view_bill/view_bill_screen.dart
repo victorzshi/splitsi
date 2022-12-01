@@ -53,17 +53,15 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
             }
 
             final url = Uri.base.toString();
-            final expiration =
-                DateTime.parse(timestamp).add(const Duration(days: 30));
+            final expireDate = DateTime.parse(timestamp).add(
+              const Duration(days: 30),
+            );
+            final expireText = DateFormat.yMMMMd().format(expireDate);
 
-            return Card(
-              margin: const EdgeInsets.all(32.0),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            return ListView(
+              children: [
+                Column(
+                  children: <Widget>[
                     const Text('Share the link below:'),
                     Tooltip(
                       message: 'Click to copy!',
@@ -80,38 +78,42 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                         child: Text(url),
                       ),
                     ),
-                    Text('Expires: ${DateFormat.yMMMMd().format(expiration)}'),
+                    Text('Expires: $expireText'),
+                    const Divider(),
                     Text(snapshot.data?.title ?? 'No title'),
-                    Text(snapshot.data?.description ?? 'No description'),
-                    ChangeNotifierProvider(
-                      create: (context) =>
-                          SubscriptionProvider(code: widget.code),
-                      child: Consumer<SubscriptionProvider>(
-                        builder: (context, provider, child) {
-                          return Column(
-                            children: [
-                              for (final expense in provider.expenses)
-                                ExpenseCard(expense: expense),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
-                    ChangeNotifierProvider(
-                      create: (context) =>
-                          SubscriptionProvider(code: widget.code),
-                      child: Consumer<SubscriptionProvider>(
-                        builder: (context, provider, child) {
-                          return CommentListView(
-                            code: widget.code,
-                            comments: provider.comments,
-                          );
-                        },
-                      ),
-                    ),
+                    if (snapshot.data?.description != null)
+                      Text(snapshot.data!.description!),
+                    const Divider(),
                   ],
                 ),
-              ),
+                ChangeNotifierProvider(
+                  create: (context) => SubscriptionProvider(code: widget.code),
+                  child: Consumer<SubscriptionProvider>(
+                    builder: (context, provider, child) {
+                      return Column(
+                        children: [
+                          for (final expense in provider.expenses)
+                            ExpenseCard(expense: expense),
+                          const Divider(),
+                          SplitResults(expenses: provider.expenses),
+                          const Divider(),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+                ChangeNotifierProvider(
+                  create: (context) => SubscriptionProvider(code: widget.code),
+                  child: Consumer<SubscriptionProvider>(
+                    builder: (context, provider, child) {
+                      return CommentListView(
+                        code: widget.code,
+                        comments: provider.comments,
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
@@ -119,6 +121,57 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
           return const CircularProgressIndicator();
         },
       ),
+    );
+  }
+}
+
+class SplitResults extends StatelessWidget {
+  const SplitResults({super.key, required this.expenses});
+
+  final List<Expense> expenses;
+
+  @override
+  Widget build(BuildContext context) {
+    final map = <String, double>{};
+
+    final people = ExpenseService.getAllPeople(expenses);
+    for (final person in people) {
+      map.putIfAbsent(person, () => 0.0);
+    }
+
+    for (final expense in expenses) {
+      for (final person in expense.people!) {
+        if (map.containsKey(person)) {
+          final split = expense.amount! / expense.people!.length;
+          map[person] = map[person]! + split;
+        }
+      }
+    }
+
+    return Column(
+      children: <Widget>[
+        const Text('Split Results'),
+        Row(
+          children: [
+            for (final item in map.entries)
+              Expanded(
+                child: Column(
+                  children: [
+                    Chip(
+                      avatar: CircleAvatar(
+                        backgroundColor:
+                            ExpenseService.convertToColor(item.key),
+                      ),
+                      label: Text(item.key),
+                    ),
+                    const SizedBox(height: 8.0),
+                    Text('\$${item.value.toStringAsFixed(2)}'),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -139,7 +192,7 @@ class CommentListView extends StatefulWidget {
 
 class _CommentListViewState extends State<CommentListView> {
   final _formKey = GlobalKey<FormState>();
-  final _controller = TextEditingController();
+  final _commentController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -155,14 +208,16 @@ class _CommentListViewState extends State<CommentListView> {
               children: [
                 Expanded(
                   child: TextFormField(
-                    controller: _controller,
+                    controller: _commentController,
                     decoration: const InputDecoration(
                       hintText: 'Leave a message',
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Enter your message to continue';
+                    validator: (text) {
+                      text = text?.trim();
+                      if (text == null || text.isEmpty) {
+                        return 'Enter a message to continue.';
                       }
+                      _commentController.text = text;
                       return null;
                     },
                   ),
@@ -171,15 +226,19 @@ class _CommentListViewState extends State<CommentListView> {
                 ElevatedButton.icon(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      final code = widget.code;
+                      final timestamp = DateTime.now().toIso8601String();
+                      final text = _commentController.text;
+
                       final comment = Comment(
-                        code: widget.code,
-                        timestamp: DateTime.now().toIso8601String(),
-                        text: _controller.text,
+                        code: code,
+                        timestamp: timestamp,
+                        text: text,
                       );
 
                       CommentService.upload(comment);
 
-                      _controller.clear();
+                      _commentController.clear();
                     }
                   },
                   icon: const Icon(Icons.send),

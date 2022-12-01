@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Expense {
@@ -42,6 +44,32 @@ class ExpenseService {
             fromFirestore: Expense.fromFirestore,
             toFirestore: (expense, options) => expense.toFirestore(),
           );
+
+  static List<String> getAllPeople(List<Expense> expenses) {
+    final uniquePeople = <String>{};
+
+    for (final expense in expenses) {
+      if (expense.people != null) {
+        uniquePeople.addAll(expense.people!);
+      }
+    }
+
+    final people = List.from(uniquePeople);
+    people.sort();
+
+    return List.from(people);
+  }
+
+  static Color convertToColor(String text) {
+    final numbers = text.codeUnits;
+    final sum = numbers.reduce((a, b) => a + b);
+
+    final remainder = sum % Colors.accents.length;
+
+    final color = Colors.accents[remainder];
+
+    return color;
+  }
 
   static Future<void> upload(List<Expense> expenses) async {
     for (final expense in expenses) {

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
@@ -38,21 +40,6 @@ class _CreateBillScreen extends State<EditBillScreen> {
     super.dispose();
   }
 
-  List<String> _getExistingPeople(List<Expense> expenses) {
-    final uniquePeople = <String>{};
-
-    for (final expense in expenses) {
-      if (expense.people != null) {
-        uniquePeople.addAll(expense.people!);
-      }
-    }
-
-    final people = List.from(uniquePeople);
-    people.sort();
-
-    return List.from(people);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +53,7 @@ class _CreateBillScreen extends State<EditBillScreen> {
             final code = snapshot.data as String;
 
             return ChangeNotifierProvider(
-              create: (context) => ExpenseProvider(code: code),
+              create: (context) => ExpenseProvider(),
               child: Consumer<ExpenseProvider>(
                 builder: (context, provider, child) {
                   return ListView(
@@ -116,8 +103,10 @@ class _CreateBillScreen extends State<EditBillScreen> {
                       const SizedBox(height: 8.0),
                       NewExpenseButton(
                         code: code,
-                        people: _getExistingPeople(provider.expenses),
+                        people: ExpenseService.getAllPeople(provider.expenses),
                       ),
+                      const SizedBox(height: 8.0),
+                      DummyDataButton(code: code),
                       const SizedBox(height: 8.0),
                       if (provider.expenses.isNotEmpty)
                         ElevatedButton.icon(
@@ -225,5 +214,46 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
           content: Text('Added "${expense.title}" expense'),
         ));
     }
+  }
+}
+
+class DummyDataButton extends StatelessWidget {
+  const DummyDataButton({super.key, required this.code});
+
+  final String code;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: () {
+        final things = ['Taxi', 'Food', 'Drinks'];
+        final names = ['Ash', 'Misty', 'Brock', 'May', 'Dawn', 'Gary'];
+
+        for (var i = 0; i < things.length; i++) {
+          final title = things[i];
+
+          final amount = Random().nextDouble() * 99 + 1;
+
+          final people = <String>[];
+          for (final name in names) {
+            if (Random().nextBool()) {
+              people.add(name);
+            }
+          }
+          if (people.isEmpty) people.add(names[Random().nextInt(names.length)]);
+
+          final expense = Expense(
+            code: code,
+            title: title,
+            amount: amount,
+            people: people,
+          );
+
+          Provider.of<ExpenseProvider>(context, listen: false).add(expense);
+        }
+      },
+      icon: const Icon(Icons.favorite),
+      label: const Text('Use dummy data'),
+    );
   }
 }

@@ -7,17 +7,6 @@ class ExpenseCard extends StatelessWidget {
 
   final Expense expense;
 
-  Color convertToColor(String name) {
-    final numbers = name.codeUnits;
-    final sum = numbers.reduce((a, b) => a + b);
-
-    final remainder = sum % Colors.accents.length;
-
-    final color = Colors.accents[remainder];
-
-    return color;
-  }
-
   @override
   Widget build(BuildContext context) {
     assert(expense.title != null);
@@ -52,7 +41,8 @@ class ExpenseCard extends StatelessWidget {
                       padding: const EdgeInsets.all(2.0),
                       child: Chip(
                         avatar: CircleAvatar(
-                          backgroundColor: convertToColor(person),
+                          backgroundColor:
+                              ExpenseService.convertToColor(person),
                         ),
                         label: Text(person),
                       ),
