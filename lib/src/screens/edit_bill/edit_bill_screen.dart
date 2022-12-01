@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/bill.dart';
+import '../../models/expense.dart';
 import '../../widgets/expense_card.dart';
 import '../edit_expense/edit_expense_screen.dart';
 import '../view_bill/view_bill_screen.dart';
@@ -26,25 +27,29 @@ class _CreateBillScreen extends State<EditBillScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final expenses = <Expense>[];
+
+    expenses.add(Expense(
+      title: 'Taxi',
+      amount: 10,
+      people: ['Ash', 'May', 'Brock', 'Misty'],
+    ));
+
+    expenses.add(Expense(
+      title: 'Food',
+      amount: 17.50,
+      people: ['Ash', 'May', 'Brock'],
+    ));
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('New bill'),
       ),
       body: ListView(
         padding: const EdgeInsets.all(8.0),
-        children: const <Widget>[
-          // TODO: Use list of expenses.
-          ExpenseCard(
-            name: 'Taxi',
-            cost: 18,
-            people: ['Ash', 'May', 'Brock', 'Misty'],
-          ),
-          ExpenseCard(
-            name: 'Food',
-            cost: 25,
-            people: ['Ash', 'May', 'Brock'],
-          ),
-          NewExpenseButton(),
+        children: <Widget>[
+          for (final expense in expenses) ExpenseCard(expense: expense),
+          const NewExpenseButton(),
         ],
       ),
       floatingActionButton: FutureBuilder<String>(
@@ -83,6 +88,8 @@ class ShareBillButton extends StatelessWidget {
 
         BillService.upload(bill);
 
+        // TODO: Add code to all expenses and upload.
+
         Navigator.restorablePopAndPushNamed(
           context,
           '${ViewBillScreen.routeName}/$code',
@@ -106,18 +113,14 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
   Widget build(BuildContext context) {
     return ElevatedButton.icon(
       onPressed: () {
-        _navigateAndDisplaySelection(context);
+        _navigateAndDisplayExpense(context);
       },
       icon: const Icon(Icons.add),
       label: const Text('New expense'),
     );
   }
 
-// A method that launches the SelectionScreen and awaits the result from
-// Navigator.pop.
-  Future<void> _navigateAndDisplaySelection(BuildContext context) async {
-    // Navigator.push returns a Future that completes after calling
-    // Navigator.pop on the Selection Screen.
+  Future<void> _navigateAndDisplayExpense(BuildContext context) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => const EditExpenseScreen()),
@@ -127,10 +130,10 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
     // must be checked after an asynchronous gap.
     if (!mounted) return;
 
-    // After the Selection Screen returns a result, hide any previous snackbars
-    // and show the new result.
+    final expense = result as Expense?;
+
     ScaffoldMessenger.of(context)
       ..removeCurrentSnackBar()
-      ..showSnackBar(SnackBar(content: Text('$result')));
+      ..showSnackBar(SnackBar(content: Text('${expense?.title}')));
   }
 }

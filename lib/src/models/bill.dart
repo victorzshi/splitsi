@@ -4,8 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Bill {
   Bill({
-    required this.code,
-    required this.timestamp,
+    this.code,
+    this.timestamp,
     this.title,
     this.description,
   });
@@ -30,17 +30,17 @@ class Bill {
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (code != null) "code": code,
-      if (timestamp != null) "timestamp": timestamp,
-      if (title != null) "title": title,
-      if (description != null) "description": description,
+      if (code != null) 'code': code,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (title != null) 'title': title,
+      if (description != null) 'description': description,
     };
   }
 }
 
 class BillService {
   static final collection =
-      FirebaseFirestore.instance.collection("bills").withConverter(
+      FirebaseFirestore.instance.collection('bills').withConverter(
             fromFirestore: Bill.fromFirestore,
             toFirestore: (bill, options) => bill.toFirestore(),
           );
@@ -51,7 +51,7 @@ class BillService {
     const length = 4;
 
     Future<bool> isNotUniqueCode() async {
-      final query = await collection.where("code", isEqualTo: code).get();
+      final query = await collection.where('code', isEqualTo: code).get();
 
       return query.docs.isNotEmpty;
     }
@@ -71,7 +71,7 @@ class BillService {
   }
 
   static Future<Bill> fetch(String code) async {
-    final query = await collection.where("code", isEqualTo: code).get();
+    final query = await collection.where('code', isEqualTo: code).get();
 
     if (query.docs.isEmpty) {
       throw Exception('Bill not found');
@@ -87,14 +87,15 @@ class BillService {
   }
 
   static void setTestData() async {
-    final query = await collection.where("code", isEqualTo: "TEST").get();
+    const code = 'TEST';
+    final query = await collection.where('code', isEqualTo: code).get();
 
     if (query.docs.isNotEmpty) return;
 
     final timestamp = DateTime.now().toIso8601String();
 
     final testBill = Bill(
-      code: 'TEST',
+      code: code,
       timestamp: timestamp,
       title: 'Test bill',
       description: 'Contains dummy data',
@@ -110,9 +111,9 @@ class BillService {
       timestamp: timestamp,
     );
 
-    await collection.doc('TEST').set(testBill);
-    await collection.doc('SAME1').set(sameBill);
-    await collection.doc('SAME2').set(sameBill);
-    await collection.doc('NULL').set(nullBill);
+    await collection.add(testBill);
+    await collection.add(sameBill);
+    await collection.add(sameBill);
+    await collection.add(nullBill);
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../models/expense.dart';
+
 class EditExpenseScreen extends StatelessWidget {
   const EditExpenseScreen({super.key});
 
@@ -17,20 +19,24 @@ class EditExpenseScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Close the screen and return "Yep!" as the result.
-                  Navigator.pop(context, 'Yep!');
+                  final expense = Expense(
+                    title: 'Drinks',
+                    amount: 22.45,
+                    people: ['Ash', 'May', 'Brock', 'Misty'],
+                  );
+
+                  Navigator.pop(context, expense);
                 },
-                child: const Text('Yep!'),
+                child: const Text('Add test expense'),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Close the screen and return "Nope." as the result.
-                  Navigator.pop(context, 'Nope.');
+                  Navigator.pop(context);
                 },
-                child: const Text('Nope.'),
+                child: const Text('Cancel'),
               ),
             )
           ],

@@ -76,7 +76,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                     Text('Expires: ${DateFormat.yMMMMd().format(expiration)}'),
                     Text(snapshot.data?.title ?? 'No title'),
                     Text(snapshot.data?.description ?? 'No description'),
-                    // TODO: Show expenses
+                    // TODO: Show expenses.
                     const Text('Expenses placeholder'),
                     ChangeNotifierProvider(
                       create: (context) =>

@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Comment {
   Comment({
-    required this.code,
-    required this.timestamp,
+    this.code,
+    this.timestamp,
     this.name,
     this.text,
   });
@@ -28,17 +28,17 @@ class Comment {
 
   Map<String, dynamic> toFirestore() {
     return {
-      if (code != null) "code": code,
-      if (timestamp != null) "timestamp": timestamp,
-      if (name != null) "name": name,
-      if (text != null) "text": text,
+      if (code != null) 'code': code,
+      if (timestamp != null) 'timestamp': timestamp,
+      if (name != null) 'name': name,
+      if (text != null) 'text': text,
     };
   }
 }
 
 class CommentService {
   static final collection =
-      FirebaseFirestore.instance.collection("comments").withConverter(
+      FirebaseFirestore.instance.collection('comments').withConverter(
             fromFirestore: Comment.fromFirestore,
             toFirestore: (comment, options) => comment.toFirestore(),
           );
@@ -48,25 +48,26 @@ class CommentService {
   }
 
   static void setTestData() async {
-    final query = await collection.where("code", isEqualTo: "TEST").get();
+    const code = 'TEST';
+    final query = await collection.where('code', isEqualTo: code).get();
 
     if (query.docs.isNotEmpty) return;
 
     final timestamp = DateTime.now().toIso8601String();
 
     final testComment = Comment(
-      code: 'TEST',
+      code: code,
       timestamp: timestamp,
       name: 'Jane Doe',
       text: 'What a cool bill!',
     );
     final anonComment = Comment(
-      code: 'TEST',
+      code: code,
       timestamp: timestamp,
       text: 'Anonymous comment...',
     );
 
-    await collection.doc('TEST1').set(testComment);
-    await collection.doc('TEST2').set(anonComment);
+    await collection.add(testComment);
+    await collection.add(anonComment);
   }
 }

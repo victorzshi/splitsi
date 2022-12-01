@@ -19,8 +19,8 @@ class CommentsObservable extends ChangeNotifier {
 
   void init() {
     _commentsSubscription = CommentService.collection
-        .where("code", isEqualTo: code)
-        .orderBy("timestamp")
+        .where('code', isEqualTo: code)
+        .orderBy('timestamp')
         .snapshots()
         .listen((snapshot) {
       _comments.clear();
@@ -34,5 +34,5 @@ class CommentsObservable extends ChangeNotifier {
     });
   }
 
-  // TODO: Cancel comments subscription
+  // TODO: Cancel comments subscription.
 }

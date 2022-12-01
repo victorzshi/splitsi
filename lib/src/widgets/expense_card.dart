@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ExpenseCard extends StatelessWidget {
-  const ExpenseCard({
-    super.key,
-    required this.name,
-    required this.cost,
-    required this.people,
-  });
+import '../models/expense.dart';
 
-  final String name;
-  final double cost;
-  final List<String> people;
+class ExpenseCard extends StatelessWidget {
+  const ExpenseCard({super.key, required this.expense});
+
+  final Expense expense;
 
   Color convertToColor(String name) {
     final numbers = name.codeUnits;
@@ -25,6 +20,14 @@ class ExpenseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    assert(expense.title != null);
+    assert(expense.amount != null);
+    assert(expense.people != null);
+
+    final title = expense.title as String;
+    final amount = '\$${(expense.amount as double).toStringAsFixed(2)}';
+    final people = expense.people as List<String>;
+
     return Card(
       child: Column(
         children: <Widget>[
@@ -32,12 +35,12 @@ class ExpenseCard extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: Center(
-                  child: Text(name),
+                  child: Text(title),
                 ),
               ),
               Expanded(
                 child: Center(
-                  child: Text('\$${cost.toStringAsFixed(2)}'),
+                  child: Text(amount),
                 ),
               ),
             ],
@@ -49,7 +52,6 @@ class ExpenseCard extends StatelessWidget {
                 Chip(
                   avatar: CircleAvatar(
                     backgroundColor: convertToColor(person),
-                    // child: Text(person[0]),
                   ),
                   label: Text(person),
                 ),

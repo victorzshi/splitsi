@@ -38,6 +38,8 @@ class App extends StatelessWidget {
             builder: (context) => ViewBillScreen(code: code),
           );
         }
+
+        return null;
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
