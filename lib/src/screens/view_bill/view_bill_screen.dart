@@ -209,14 +209,15 @@ class _CommentListViewState extends State<CommentListView> {
           child: Form(
             key: _formKey,
             child: Row(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   child: TextFormField(
                     controller: _commentController,
                     decoration: const InputDecoration(
-                      hintText: 'Leave a message',
+                      labelText: 'Leave a comment',
+                      hintText: 'Paid already? Billing mistake? Say something!',
                     ),
+                    textCapitalization: TextCapitalization.sentences,
                     validator: (text) {
                       text = text?.trim();
                       if (text == null || text.isEmpty) {

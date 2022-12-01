@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+
 import 'screens/edit_bill/edit_bill_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/view_bill/view_bill_screen.dart';
@@ -13,6 +15,50 @@ class App extends StatelessWidget {
       title: 'Splitsi - Bill Splitting App',
       theme: ThemeData.dark(),
       home: const HomeScreen(),
+      routes: {
+        '/sign-in': ((context) {
+          return SignInScreen(
+            actions: [
+              ForgotPasswordAction(((context, email) {
+                Navigator.of(context)
+                    .pushNamed('/forgot-password', arguments: {'email': email});
+              })),
+              AuthStateChangeAction(((context, state) {
+                if (state is SignedIn || state is UserCreated) {
+                  var user = (state is SignedIn)
+                      ? state.user
+                      : (state as UserCreated).credential.user;
+                  if (user == null) {
+                    return;
+                  }
+                  if (state is UserCreated) {
+                    user.updateDisplayName(user.email!.split('@')[0]);
+                  }
+                  Navigator.popUntil(context, ModalRoute.withName('/'));
+                }
+              })),
+            ],
+          );
+        }),
+        '/forgot-password': ((context) {
+          final arguments = ModalRoute.of(context)?.settings.arguments
+              as Map<String, dynamic>?;
+
+          return ForgotPasswordScreen(
+            email: arguments?['email'] as String,
+            headerMaxExtent: 200,
+          );
+        }),
+        '/profile': (context) {
+          return ProfileScreen(
+            actions: [
+              SignedOutAction((context) {
+                Navigator.popUntil(context, ModalRoute.withName('/'));
+              }),
+            ],
+          );
+        },
+      },
       onGenerateRoute: (settings) {
         if (settings.name == HomeScreen.routeName) {
           return MaterialPageRoute(

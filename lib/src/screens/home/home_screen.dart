@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../widgets/profile_button.dart';
 import '../edit_bill/edit_bill_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -12,6 +13,9 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Splitsi'),
+        actions: const [
+          ProfileButton(),
+        ],
       ),
       body: Center(
         child: Column(
