@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../models/bill.dart';
+import '../../widgets/expense_card.dart';
 import '../view_bill/view_bill_screen.dart';
 
 class CreateBillScreen extends StatefulWidget {
@@ -13,9 +14,6 @@ class CreateBillScreen extends StatefulWidget {
 }
 
 class _CreateBillScreen extends State<CreateBillScreen> {
-  final _title = TextEditingController();
-  final _description = TextEditingController();
-
   late Future<String> _code;
 
   @override
@@ -26,46 +24,25 @@ class _CreateBillScreen extends State<CreateBillScreen> {
   }
 
   @override
-  void dispose() {
-    _title.dispose();
-    _description.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create a bill'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      body: ListView(
+        padding: const EdgeInsets.all(8.0),
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _title,
-              decoration: const InputDecoration(
-                hintText: 'What should we call this bill?',
-                labelText: 'Title',
-              ),
-            ),
+          const ExpenseCard(
+            name: 'Taxi',
+            cost: 18,
+            people: ['Ash', 'May', 'Brock', 'Misty'],
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextFormField(
-              controller: _description,
-              decoration: const InputDecoration(
-                hintText: 'Any details we should mention?',
-                labelText: 'Description (optional)',
-              ),
-            ),
+          const ExpenseCard(
+            name: 'Food',
+            cost: 25,
+            people: ['Ash', 'May', 'Brock'],
           ),
-          ElevatedButton.icon(
-            onPressed: null,
-            icon: const Icon(Icons.add),
-            label: const Text('Add new expense'),
-          ),
+          // TODO: Show share button only if at least one expense exists.
           FutureBuilder<String>(
             future: _code,
             builder: (context, snapshot) {
@@ -75,15 +52,10 @@ class _CreateBillScreen extends State<CreateBillScreen> {
                     // TODO: Confirm with user that data is finalized
 
                     final code = snapshot.data;
-                    final title = _title.text.isNotEmpty ? _title.text : null;
-                    final description =
-                        _description.text.isNotEmpty ? _description.text : null;
                     final timestamp = DateTime.now().toIso8601String();
 
                     final bill = Bill(
                       code: code,
-                      title: title,
-                      description: description,
                       timestamp: timestamp,
                     );
 
@@ -105,6 +77,13 @@ class _CreateBillScreen extends State<CreateBillScreen> {
             },
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // TODO: Show expense dialog.
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add new expense'),
       ),
     );
   }
