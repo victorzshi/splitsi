@@ -6,8 +6,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../models/comment.dart';
 
-class CommentsObservable extends ChangeNotifier {
-  CommentsObservable({required this.code}) {
+class CommentsNotifier extends ChangeNotifier {
+  CommentsNotifier({required this.code}) {
     init();
   }
 
@@ -34,5 +34,9 @@ class CommentsObservable extends ChangeNotifier {
     });
   }
 
-  // TODO: Cancel comments subscription.
+  @override
+  void dispose() {
+    _commentsSubscription?.cancel();
+    super.dispose();
+  }
 }

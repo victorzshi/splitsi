@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/bill.dart';
 import '../../models/comment.dart';
-import 'comments_observable.dart';
+import 'comments_notifier.dart';
 
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
@@ -79,9 +79,8 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                     // TODO: Show expenses.
                     const Text('Expenses placeholder'),
                     ChangeNotifierProvider(
-                      create: (context) =>
-                          CommentsObservable(code: widget.code),
-                      child: Consumer<CommentsObservable>(
+                      create: (context) => CommentsNotifier(code: widget.code),
+                      child: Consumer<CommentsNotifier>(
                         builder: (context, comments, child) {
                           return Comments(
                             code: widget.code,
