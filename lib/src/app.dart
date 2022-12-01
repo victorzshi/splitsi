@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/create_bill/create_bill_screen.dart';
+import 'screens/edit_bill/edit_bill_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/view_bill/view_bill_screen.dart';
 
@@ -21,10 +21,10 @@ class App extends StatelessWidget {
           );
         }
 
-        if (settings.name == CreateBillScreen.routeName) {
+        if (settings.name == EditBillScreen.routeName) {
           return MaterialPageRoute(
             settings: settings,
-            builder: (context) => const CreateBillScreen(),
+            builder: (context) => const EditBillScreen(),
           );
         }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../create_bill/create_bill_screen.dart';
+import '../edit_bill/edit_bill_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -23,14 +23,15 @@ class HomeScreen extends StatelessWidget {
               'Splitsi is the fastest and easiest way to split bills.',
             ),
             const SizedBox(height: 32),
-            ElevatedButton(
+            ElevatedButton.icon(
               onPressed: () {
                 Navigator.restorablePushNamed(
                   context,
-                  CreateBillScreen.routeName,
+                  EditBillScreen.routeName,
                 );
               },
-              child: const Text('Create a bill'),
+              icon: const Icon(Icons.add),
+              label: const Text('New bill'),
             ),
           ],
         ),
