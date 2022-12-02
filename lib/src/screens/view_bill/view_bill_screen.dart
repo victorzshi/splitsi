@@ -93,10 +93,10 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                     builder: (context, provider, child) {
                       return Column(
                         children: [
+                          SplitResults(expenses: provider.expenses),
+                          const Divider(),
                           for (final expense in provider.expenses)
                             ExpenseCard(expense: expense),
-                          const Divider(),
-                          SplitResults(expenses: provider.expenses),
                           const Divider(),
                           CommentListView(
                             code: widget.code,

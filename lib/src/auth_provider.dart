@@ -19,7 +19,7 @@ class AuthProvider extends ChangeNotifier {
       EmailAuthProvider(),
     ]);
 
-    FirebaseAuth.instance.userChanges().listen((user) {
+    FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null) {
         _signedIn = true;
       } else {

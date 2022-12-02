@@ -181,7 +181,7 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
         _navigateAndDisplayExpense(context);
       },
       icon: const Icon(Icons.add),
-      label: const Text('New expense'),
+      label: const Text('Add expense'),
     );
   }
 
