@@ -9,6 +9,7 @@ import 'screens/history/history_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/view_bill/view_bill_screen.dart';
 
+/// Handle navigation between screens. Uses FirebaseUI for sign-in flows.
 class App extends StatelessWidget {
   const App({super.key});
 

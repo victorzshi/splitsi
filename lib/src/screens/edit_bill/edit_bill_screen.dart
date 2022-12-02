@@ -13,6 +13,7 @@ import '../edit_expense/edit_expense_screen.dart';
 import '../view_bill/view_bill_screen.dart';
 import 'expense_provider.dart';
 
+/// Write a new bill and upload to database. Makes sure data is validated.
 class EditBillScreen extends StatefulWidget {
   const EditBillScreen({super.key});
 
@@ -103,52 +104,57 @@ class _CreateBillScreen extends State<EditBillScreen> {
                         ExpenseCard(expense: expense),
                       const Divider(),
                       const SizedBox(height: 8.0),
-                      NewExpenseButton(
-                        code: code,
-                        people: ExpenseService.getAllPeople(provider.expenses),
+                      Center(
+                        child: NewExpenseButton(
+                          code: code,
+                          people:
+                              ExpenseService.getAllPeople(provider.expenses),
+                        ),
                       ),
                       const SizedBox(height: 8.0),
-                      DummyDataButton(code: code),
+                      Center(
+                        child: DummyDataButton(code: code),
+                      ),
                       const SizedBox(height: 8.0),
                       if (provider.expenses.isNotEmpty)
-                        ElevatedButton.icon(
-                          onPressed: () {
-                            // TODO: Confirm with user that data is finalized.
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              if (_formKey.currentState!.validate()) {
+                                final timestamp =
+                                    DateTime.now().toIso8601String();
+                                final title = _titleController.text.isNotEmpty
+                                    ? _titleController.text
+                                    : null;
+                                final description =
+                                    _descriptionController.text.isNotEmpty
+                                        ? _descriptionController.text
+                                        : null;
 
-                            if (_formKey.currentState!.validate()) {
-                              // final code = snapshot.data as String;
-                              final timestamp =
-                                  DateTime.now().toIso8601String();
-                              final title = _titleController.text.isNotEmpty
-                                  ? _titleController.text
-                                  : null;
-                              final description =
-                                  _descriptionController.text.isNotEmpty
-                                      ? _descriptionController.text
-                                      : null;
+                                final bill = Bill(
+                                  code: code,
+                                  timestamp: timestamp,
+                                  title: title,
+                                  description: description,
+                                );
 
-                              final bill = Bill(
-                                code: code,
-                                timestamp: timestamp,
-                                title: title,
-                                description: description,
-                              );
+                                final uid =
+                                    Provider.of<Auth>(context, listen: false)
+                                        .uid;
+                                AccountService.addCodes(uid, [code]);
 
-                              final uid =
-                                  Provider.of<Auth>(context, listen: false).uid;
-                              AccountService.addCodes(uid, [code]);
+                                BillService.upload(bill);
+                                ExpenseService.upload(provider.expenses);
 
-                              BillService.upload(bill);
-                              ExpenseService.upload(provider.expenses);
-
-                              Navigator.restorablePopAndPushNamed(
-                                context,
-                                '${ViewBillScreen.routeName}/$code',
-                              );
-                            }
-                          },
-                          icon: const Icon(Icons.share),
-                          label: const Text('Share bill'),
+                                Navigator.restorablePopAndPushNamed(
+                                  context,
+                                  '${ViewBillScreen.routeName}/$code',
+                                );
+                              }
+                            },
+                            icon: const Icon(Icons.share),
+                            label: const Text('Share bill'),
+                          ),
                         )
                     ],
                   );
@@ -195,7 +201,6 @@ class _NewExpenseButtonState extends State<NewExpenseButton> {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(builder: (context) {
-        // TODO: Edit existing expense.
         return EditExpenseScreen(
           expense: Expense(
             code: widget.code,

@@ -12,8 +12,12 @@ import 'src/models/bill.dart';
 import 'src/models/comment.dart';
 import 'src/models/expense.dart';
 
+/// App's entry point. Make sure it starts properly and set test data for
+/// development mode.
 void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.web);
+
+  WidgetsFlutterBinding.ensureInitialized();
 
   if (kDebugMode) {
     AccountService.setTestData();
@@ -21,8 +25,6 @@ void main() async {
     BillService.setTestData();
     ExpenseService.setTestData();
   }
-
-  WidgetsFlutterBinding.ensureInitialized();
 
   runApp(ChangeNotifierProvider(
     create: (context) => Auth(),

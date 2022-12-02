@@ -4,6 +4,7 @@ import '../../models/account.dart';
 import '../../screens/view_bill/view_bill_screen.dart';
 import '../../widgets/copy_text.dart';
 
+/// Show registered user's history of previously created bills.
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key, required this.uid});
 
@@ -50,7 +51,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               padding: const EdgeInsets.all(8.0),
               children: [
                 const Center(
-                  child: Text('Previous bills...'),
+                  child: Text('Previous bills:'),
                 ),
                 for (final code in codes)
                   Center(

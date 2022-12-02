@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Anonymous and registered users can leave comments. Must be associated with
+/// a bill. Timestamp is used to order comments by most recent/oldest.
 class Comment {
   Comment({
     this.code,

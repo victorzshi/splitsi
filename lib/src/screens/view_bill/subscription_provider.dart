@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/comment.dart';
 import '../../models/expense.dart';
 
+/// Contains listeners to database to update bill in real-time.
 class SubscriptionProvider extends ChangeNotifier {
   SubscriptionProvider({required this.code}) {
     init();

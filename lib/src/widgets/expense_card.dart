@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/expense.dart';
 
+/// Present expense data in a pretty way.
 class ExpenseCard extends StatelessWidget {
   const ExpenseCard({super.key, required this.expense});
 

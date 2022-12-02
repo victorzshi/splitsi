@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+/// Highlight copyable text. Copy to clipboard on click.
 class CopyText extends StatelessWidget {
   const CopyText({super.key, required this.text});
 

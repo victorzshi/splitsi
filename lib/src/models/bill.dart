@@ -2,6 +2,9 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// General bill-related info. Every bill has a unique code that identifies it.
+/// Timestamp is used to calculate when the data should be removed from the
+/// database.
 class Bill {
   Bill({
     this.code,

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// If user is registered, we keep history of their bills (unique codes).
 class Account {
   Account({
     this.codes,

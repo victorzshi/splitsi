@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/expense.dart';
 
+/// Write a new expense. Makes sure data is validated.
 class EditExpenseScreen extends StatefulWidget {
   const EditExpenseScreen({super.key, required this.expense});
 
@@ -38,7 +39,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit expense'),
+        title: const Text('Add expense'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -75,11 +76,11 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                     if (text == null || text.isEmpty) {
                       return 'Please enter a number.';
                     }
-                    final value = double.tryParse(text);
-                    if (value == null) {
+                    text = double.tryParse(text)?.toStringAsFixed(2);
+                    if (text == null) {
                       return 'Please enter a integer or decimal.';
                     }
-                    if (value <= 0) {
+                    if (num.parse(text) <= 0) {
                       return 'Please enter a positive non-zero value.';
                     }
                     _amountController.text = text;
@@ -112,7 +113,7 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         final code = widget.expense.code!;
@@ -132,7 +133,8 @@ class _EditExpenseScreenState extends State<EditExpenseScreen> {
                         Navigator.pop(context, expense);
                       }
                     },
-                    child: const Text('Add expense'),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Add expense'),
                   ),
                 ),
               ],

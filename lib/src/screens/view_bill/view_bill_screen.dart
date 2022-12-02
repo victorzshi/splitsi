@@ -11,6 +11,8 @@ import '../../widgets/copy_text.dart';
 import '../../widgets/expense_card.dart';
 import 'subscription_provider.dart';
 
+/// Read-only screen for bill info. Must know the unique code beforehand. Can
+/// add comments.
 class ViewBillScreen extends StatefulWidget {
   const ViewBillScreen({super.key, required this.code});
 

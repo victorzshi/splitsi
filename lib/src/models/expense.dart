@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// The money that is being split up. Must be associated to a bill.
 class Expense {
   Expense({
     this.code,
