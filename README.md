@@ -2,18 +2,7 @@
 
 A bill splitting app.
 
-## Getting Started
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-## Prerequisites
+## Installation
 
 You need the following:
 
@@ -23,12 +12,14 @@ You need the following:
 - A Google Account for the creation and management of your Firebase project.
 - The [`Firebase` CLI](https://firebase.google.com/docs/cli) logged in to your Google Account.
 
-## Deploy
+## Usage
 
-This project is configured to be a website hosted on Firebase Hosting:
+To run the app:
 
-- [https://splitsi-3e71f.web.app/](https://splitsi-3e71f.web.app/)
-- [https://splitsi-3e71f.firebaseapp.com/](https://splitsi-3e71f.firebaseapp.com/)
+```sh
+flutter pub get
+flutter run
+```
 
 To deploy the latest changes:
 
@@ -37,7 +28,11 @@ flutter build web
 firebase deploy
 ```
 
-## Useful Resources
+This project is hosted as a live website:
 
-- [Get to know Firebase for Flutter](https://firebase.google.com/codelabs/firebase-get-to-know-flutter)
-- [Build and deploy a Flutter web app with Firebase](https://blog.bitrise.io/post/build-and-deploy-flutter-web-app-firebase)
+- [https://splitsi-3e71f.web.app/](https://splitsi-3e71f.web.app/)
+
+For testing, register a new account with a fake email or use the test account below:
+
+- Email: `test@email.com`
+- Password: `123456`
