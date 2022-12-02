@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
+import 'package:provider/provider.dart';
 
+import 'auth.dart';
 import 'screens/edit_bill/edit_bill_screen.dart';
+import 'screens/history/history_screen.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/view_bill/view_bill_screen.dart';
 
@@ -32,7 +35,7 @@ class App extends StatelessWidget {
                     return;
                   }
                   if (state is UserCreated) {
-                    user.updateDisplayName(user.email!.split('@')[0]);
+                    user.updateDisplayName(user.email!.split('@').first);
                   }
                   Navigator.popUntil(context, ModalRoute.withName('/'));
                 }
@@ -67,6 +70,15 @@ class App extends StatelessWidget {
           return MaterialPageRoute(
             settings: settings,
             builder: (context) => const HomeScreen(),
+          );
+        }
+
+        if (settings.name == HistoryScreen.routeName) {
+          final uid = Provider.of<Auth>(context, listen: false).uid;
+
+          return MaterialPageRoute(
+            settings: settings,
+            builder: (context) => HistoryScreen(uid: uid),
           );
         }
 

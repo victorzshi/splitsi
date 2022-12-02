@@ -1,14 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_provider.dart';
+import '../../auth.dart';
 import '../../models/bill.dart';
 import '../../models/comment.dart';
 import '../../models/expense.dart';
+import '../../widgets/copy_text.dart';
 import '../../widgets/expense_card.dart';
 import 'subscription_provider.dart';
 
@@ -29,11 +28,6 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
   @override
   void initState() {
     super.initState();
-    if (kDebugMode) {
-      BillService.setTestData();
-      ExpenseService.setTestData();
-      CommentService.setTestData();
-    }
     _bill = BillService.fetch(widget.code);
   }
 
@@ -64,21 +58,7 @@ class _ViewBillScreenState extends State<ViewBillScreen> {
                 Column(
                   children: <Widget>[
                     const Text('Share the link below:'),
-                    Tooltip(
-                      message: 'Click to copy!',
-                      child: TextButton(
-                        onPressed: () async {
-                          Clipboard.setData(ClipboardData(text: url));
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Copied!'),
-                            ),
-                          );
-                        },
-                        child: Text(url),
-                      ),
-                    ),
+                    CopyText(text: url),
                     Text('Expires: $expireText'),
                     const Divider(),
                     Text(snapshot.data?.title ?? 'No title'),
@@ -229,8 +209,7 @@ class _CommentListViewState extends State<CommentListView> {
                       final code = widget.code;
                       final timestamp = DateTime.now().toIso8601String();
                       final name =
-                          Provider.of<AuthProvider>(context, listen: false)
-                              .name;
+                          Provider.of<Auth>(context, listen: false).name;
                       final text = _commentController.text;
 
                       final comment = Comment(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 
+import '../../auth.dart';
+import '../../models/account.dart';
 import '../../models/bill.dart';
 import '../../models/expense.dart';
 import '../../widgets/expense_card.dart';
@@ -131,6 +133,10 @@ class _CreateBillScreen extends State<EditBillScreen> {
                                 title: title,
                                 description: description,
                               );
+
+                              final uid =
+                                  Provider.of<Auth>(context, listen: false).uid;
+                              AccountService.addCodes(uid, [code]);
 
                               BillService.upload(bill);
                               ExpenseService.upload(provider.expenses);

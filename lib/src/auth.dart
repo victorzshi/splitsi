@@ -3,16 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
-class AuthProvider extends ChangeNotifier {
-  AuthProvider() {
+class Auth extends ChangeNotifier {
+  Auth() {
     init();
   }
 
   bool get signedIn => _signedIn;
   bool _signedIn = false;
 
-  // TODO: Add user collection in database.
   String? get name => FirebaseAuth.instance.currentUser?.displayName;
+
+  String? get uid => FirebaseAuth.instance.currentUser?.uid;
 
   Future<void> init() async {
     FirebaseUIAuth.configureProviders([
