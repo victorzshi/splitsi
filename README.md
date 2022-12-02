@@ -1,6 +1,6 @@
 # Splitsi
 
-A bill splitting app.
+A bill splitting app. Check out the [live demo](https://splitsi-3e71f.web.app)!
 
 ## Installation
 
@@ -27,10 +27,6 @@ To deploy the latest changes:
 flutter build web
 firebase deploy
 ```
-
-This project is hosted as a live website:
-
-- [https://splitsi-3e71f.web.app/](https://splitsi-3e71f.web.app/)
 
 For testing, register a new account with a fake email or use the test account below:
 
